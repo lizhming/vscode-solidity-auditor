@@ -112,31 +112,59 @@ class Commands {
     }
   }
 
-  async generateUnittestStubForContract(document, contractName) {
+  async generateUnittestStubForContract(document, contract) {
     this._checkIsSolidity(document);
 
     let content;
-    if (settings.extensionConfig().test.defaultUnittestTemplate === "hardhat") {
-      content = mod_templates.generateHardhatUnittestStubForContract(
-        document,
-        this.g_parser,
-        contractName,
-      );
-    } else {
-      content = mod_templates.generateUnittestStubForContract(
-        document,
-        this.g_parser,
-        contractName,
-      );
+    let language;
+    const framework = settings.extensionConfig().test.defaultUnittestTemplate;
+    switch (framework) {
+      case 'hardhat':
+        content = mod_templates.generateHardhatUnittestStubForContract(
+          document,
+          this.g_workspace,
+          contract
+        );
+        language = 'javascript';
+        break;
+      case 'truffle':
+        content = mod_templates.generateTruffleUnittestStubForContract(
+          document,
+          this.g_workspace,
+          contract
+        );
+        language = 'javascript';
+        break;
+      case 'forge':
+        let generateForkStub = false;
+        await vscode.window
+          .showInformationMessage(
+            'Do you want to add fork testing stub?',
+            'Yes',
+            'No'
+          )
+          .then((answer) => {
+            if (answer === 'Yes') {
+              generateForkStub = true;
+            }
+          });
+        content = mod_templates.generateForgeUnittestStubForContract(
+          document,
+          this.g_workspace,
+          contract,
+          generateForkStub
+        );
+        language = 'solidity';
+        break;
+      default:
+        throw new Error('Unsupported testing framework');
     }
-
     vscode.workspace
-      .openTextDocument({ content: content, language: "javascript" })
+      .openTextDocument({ content: content, language: language })
       .then((doc) =>
-        vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside),
+        vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside)
       );
   }
-
   async surya(documentOrListItems, command, args) {
     //check if input was document or listItem
     if (!documentOrListItems) {

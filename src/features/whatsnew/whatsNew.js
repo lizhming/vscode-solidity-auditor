@@ -8,16 +8,16 @@ const vscode = require("vscode");
 const { InteractiveWebviewGenerator } = require("./interactiveWebview.js");
 const settings = require("../../settings");
 
-var semver = require("semver");
+// var semver = require("semver");
 
 const SKIP_VERSIONS = {
   "0.0.25": function (lastSeenVersion) {
     //extensionversion is 0.0.25
-    return semver.satisfies(lastSeenVersion, ">=0.0.24"); //skip if last seen version was 0.0.24 or greater
+    // return semver.satisfies(lastSeenVersion, ">=0.0.24"); //skip if last seen version was 0.0.24 or greater
   },
   "0.0.29": function (lastSeenVersion) {
     //extensionversion is 0.0.29
-    return semver.satisfies(lastSeenVersion, ">=0.0.28"); //skip if last seen version was 0.0.28 or greater
+    // return semver.satisfies(lastSeenVersion, ">=0.0.28"); //skip if last seen version was 0.0.28 or greater
   },
 };
 
@@ -80,18 +80,19 @@ class WhatsNewHandler {
 
     if (lastSeenVersion) {
       // what's new msg seen before
-      if (semver.satisfies(lastSeenVersion, ">=" + extensionVersion)) {
-        // msg seen
-        console.log(">=" + extensionVersion);
-        return;
-      }
+      // if (semver.satisfies(lastSeenVersion, ">=" + extensionVersion)) {
+      //   // msg seen
+      //   console.log(">=" + extensionVersion);
+      //   return;
+      // }
 
-      //skip if previous version what's new has been seen
-      let check_skip_fn = SKIP_VERSIONS[extensionVersion];
-      if (check_skip_fn && check_skip_fn(lastSeenVersion)) {
-        console.log("Skipping what's new for:" + extensionVersion);
-        return;
-      }
+      // //skip if previous version what's new has been seen
+      // let check_skip_fn = SKIP_VERSIONS[extensionVersion];
+      // if (check_skip_fn && check_skip_fn(lastSeenVersion)) {
+      //   console.log("Skipping what's new for:" + extensionVersion);
+      //   return;
+      // }
+      return;
     }
 
     await this.showMessage(context);
